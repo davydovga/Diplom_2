@@ -1,21 +1,21 @@
 package tests;
 
-import configuration.Generators;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.junit.Test;
 import requests.user.CreateUserReq;
+import responses.user.CreateUserBadResponse;
 import responses.user.CreateUserResponse;
 
-import static api.UserAPI.editUserInfoAPI;
-import static api.UserAPI.getUserInfoAPI;
+import static api.UserAPI.*;
+import static configuration.ErrorMessages.EDIT_USER_BAD_REQ;
 import static org.junit.Assert.*;
 
 public class EditUserTest extends CommonParams{
 
-    CreateUserResponse responseForGetReq = createUserResponse.as(CreateUserResponse.class);
-    String token = responseForGetReq.getAccessToken().substring(7);
+
+    CreateUserReq changedUser = dataGenerator.createUser();
 
 
 
@@ -36,26 +36,45 @@ public class EditUserTest extends CommonParams{
                 response.as(CreateUserResponse.class).getUser().getName());
     }
 
+
     @Test
-    @DisplayName("")
-    @Description("")
-    public void editUserInfoTest(){
-        System.out.println(createUserReq.getEmail());
-
-        CreateUserReq changedUser = new Generators().createUser();
-
-        System.out.println(changedUser.getEmail());
-
+    @DisplayName("Тест возможности изменть email пользователя")
+    @Description("Тест передает в тело запроса токен пользователя и данные другого пользователя, после проверяет что данные в пользователе поменялись")
+    public void editUserEmailInfoTest(){
         Response response = editUserInfoAPI(token, changedUser);
 
-			  System.out.println(response.asString());
-//        response.then()
-//                .assertThat()
-//                .statusCode(200);
+        response.then()
+                .assertThat()
+                .statusCode(200);
 
-        response.prettyPrint();
+        assertEquals(changedUser.getEmail(), response.as(CreateUserResponse.class).getUser().getEmail());
+    }
+
+    @Test
+    @DisplayName("Тест возможности изменть имя пользователя")
+    @Description("Тест передает в тело запроса токен пользователя и данные другого пользователя, после проверяет что данные в пользователе поменялись")
+    public void editUserNameInfoTest(){
+        Response response = editUserInfoAPI(token, changedUser);
+
+        response.then()
+                .assertThat()
+                .statusCode(200);
+
+        assertEquals(changedUser.getName(), response.as(CreateUserResponse.class).getUser().getName());
+    }
+
+    @Test
+    @DisplayName("Негативный тест изменения пользователя без авторизации")
+    @Description("Тест проверяет что невозможно изменть данные пользователя без авторизации")
+    public void editUserInfoTestWithoutAuth(){
+        Response response = editUserInfoAPIWithoutAuth(createUserReq);
+
+        response.then()
+                .assertThat()
+                .statusCode(401);
 
 
-        assertEquals(createUserReq.getEmail(), changedUser.getEmail());
+        assertFalse(response.as(CreateUserBadResponse.class).isSuccess());
+        assertEquals(EDIT_USER_BAD_REQ,response.as(CreateUserBadResponse.class).getMessage());
     }
 }

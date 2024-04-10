@@ -1,4 +1,4 @@
-package requests.login;
+package requests.user;
 
 
 import lombok.AllArgsConstructor;

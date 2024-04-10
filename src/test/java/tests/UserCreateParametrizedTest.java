@@ -1,12 +1,10 @@
 package tests;
 
 
-import configuration.Generators;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -40,7 +38,7 @@ public class UserCreateParametrizedTest extends CommonParams {
 
 
     @Test
-    @DisplayName("Метод проверки некорретного создания пользователя")
+    @DisplayName("Нетивный тест создания пользователя")
     @Description("На вход передается три набора параметров с пустым логином,паролем и именем")
     public void checkUserCreationErrorTest(){
         CreateUserReq userParametrizedReq = new CreateUserReq(email, password, name);
